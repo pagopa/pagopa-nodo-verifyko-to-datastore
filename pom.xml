@@ -3,21 +3,33 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>it.gov.pagopa.project</groupId>
-    <artifactId>example-function</artifactId>
+    <groupId>it.gov.pagopa</groupId>
+    <artifactId>nodoverifykotodatastore</artifactId>
     <version>0.0.1</version>
     <packaging>jar</packaging>
 
-    <name>Azure Custom Fn</name>
+    <name>Nodo Verify KO to datastore Fn</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>11</java.version>
-        <azure.functions.maven.plugin.version>1.15.0</azure.functions.maven.plugin.version>
-        <azure.functions.java.library.version>1.4.2</azure.functions.java.library.version>
-        <functionAppName>com.microsoft.azure-20220215182005862</functionAppName>
+        <azure.functions.maven.plugin.version>1.26.0</azure.functions.maven.plugin.version>
+        <azure.functions.java.library.version>3.0.0</azure.functions.java.library.version>
+        <functionAppName>pagopa-d-weu-nodo-verifyko-to-datastore-fn</functionAppName>
         <resteasy.version>3.15.3.Final</resteasy.version>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.azure</groupId>
+                <artifactId>azure-sdk-bom</artifactId>
+                <version>1.2.13</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <!-- Start Azure -->
@@ -109,7 +121,6 @@
         <!-- resteasy END -->
 
         <!-- Jackson START-->
-
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
@@ -119,7 +130,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.13.4.2</version>
+            <version>2.13.2.1</version>
         </dependency>
 
         <dependency>
@@ -134,6 +145,18 @@
             <version>2.13.1</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>2.15.2</version>
+        </dependency>
+
+        <!--        <dependency>-->
+        <!--            <groupId>org.mongodb</groupId>-->
+        <!--            <artifactId>mongo-java-driver</artifactId>-->
+        <!--            <version>3.4.2</version>-->
+        <!--        </dependency>-->
+
         <!-- Jackson END-->
 
         <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
@@ -142,6 +165,13 @@
             <artifactId>lombok</artifactId>
             <version>1.18.20</version>
             <scope>provided</scope>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>2.0.7</version>
         </dependency>
 
     </dependencies>
@@ -168,15 +198,19 @@
                     <appSettings>
                         <property>
                             <name>FUNCTIONS_EXTENSION_VERSION</name>
-                            <value>~3</value>
+                            <value>~4</value>
+                        </property>
+                        <property>
+                            <name>FUNCTIONS_WORKER_RUNTIME</name>
+                            <value>java</value>
                         </property>
                     </appSettings>
                     <resourceGroup>java-functions-group</resourceGroup>
                     <appServicePlanName>java-functions-app-service-plan</appServicePlanName>
                     <region>westus</region>
                     <runtime>
-                        <os>windows</os>
-                        <javaVersion>11</javaVersion>
+                        <os>linux</os>
+                        <javaVersion>${java.version}</javaVersion>
                     </runtime>
                 </configuration>
                 <executions>

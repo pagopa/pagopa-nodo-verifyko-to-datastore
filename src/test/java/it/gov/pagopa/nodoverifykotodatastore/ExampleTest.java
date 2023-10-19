@@ -1,4 +1,4 @@
-package it.gov.pagopa.project;
+package it.gov.pagopa.nodoverifykotodatastore;
 
 import com.microsoft.azure.functions.ExecutionContext;
 import com.microsoft.azure.functions.HttpRequestMessage;
