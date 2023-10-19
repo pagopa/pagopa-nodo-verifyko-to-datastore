@@ -15,7 +15,7 @@
         <java.version>11</java.version>
         <azure.functions.maven.plugin.version>1.26.0</azure.functions.maven.plugin.version>
         <azure.functions.java.library.version>3.0.0</azure.functions.java.library.version>
-        <functionAppName>pagopa-d-weu-nodo-verifyko-to-datastore-fn</functionAppName>
+        <functionAppName>pagopa-d-weu-nodo-verifyko2ds-fn</functionAppName>
         <resteasy.version>3.15.3.Final</resteasy.version>
     </properties>
 
