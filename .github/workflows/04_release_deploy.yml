@@ -120,7 +120,7 @@ jobs:
     name: Notify
     needs: [ setup, release, deploy_azure_fn ]
     runs-on: ubuntu-latest
-    if: always()
+    if: ${{ always() && needs.setup.outputs.environment != 'dev' }}
     steps:
       - name: Report Status
         if: always()
