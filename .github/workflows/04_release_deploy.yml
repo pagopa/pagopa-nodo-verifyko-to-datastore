@@ -116,8 +116,6 @@ jobs:
     with:
       environment: ${{ matrix.environment }}
       target: ${{ needs.setup.outputs.environment }}
-      resource_group: ${{ vars.FUNCTION_RESOURCE_GROUP }}
-      app_name: ${{ vars.FUNCTION_APP_NAME }}
       registry_image: ${{ needs.release.outputs.registry_image }}
 
   notify:

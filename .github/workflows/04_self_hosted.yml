@@ -11,14 +11,6 @@ on:
         required: true
         description: The environment target of the job
         type: string
-      resource_group:
-        required: true
-        description: The resource group of the function to deploy
-        type: string
-      app_name:
-        required: true
-        description: The name of the function to deploy
-        type: string
       registry_image:
         required: true
         description: The name of the image from container registry to be used
@@ -60,8 +52,8 @@ jobs:
           client_id: ${{ secrets.CLIENT_ID }}
           tenant_id: ${{ secrets.TENANT_ID }}
           subscription_id: ${{ secrets.SUBSCRIPTION_ID }}
-          resource_group: ${{ inputs.resource_group }}
-          app_name: ${{ inputs.app_name }}
+          resource_group: ${{ env.RESOURCE_GROUP }}
+          app_name: ${{ env.APP_NAME }}
           registry_image: ${{ inputs.registry_image }}
 
 
@@ -81,7 +73,7 @@ jobs:
           client_id: ${{ secrets.CLIENT_ID }}
           tenant_id: ${{ secrets.TENANT_ID }}
           subscription_id: ${{ secrets.SUBSCRIPTION_ID }}
-          app_name: ${{ inputs.app_name }}
+          app_name: ${{ env.APP_NAME }}
           registry_image: ${{ inputs.registry_image }}
 
 
@@ -101,6 +93,6 @@ jobs:
           client_id: ${{ secrets.CLIENT_ID }}
           tenant_id: ${{ secrets.TENANT_ID }}
           subscription_id: ${{ secrets.SUBSCRIPTION_ID }}
-          resource_group: ${{ inputs.resource_group }}
-          app_name: ${{ inputs.app_name }}
+          resource_group: ${{ env.RESOURCE_GROUP }}
+          app_name: ${{ env.APP_NAME }}
           registry_image: ${{ inputs.registry_image }}
