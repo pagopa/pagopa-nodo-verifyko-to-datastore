@@ -24,16 +24,13 @@ jobs:
   show_input:
     runs-on: ubuntu-latest
     if: ${{ inputs.target == inputs.environment }}
-    env:
-      RESOURCE_GROUP: ${{ vars.FUNCTION_RESOURCE_GROUP }}
-      APP_NAME: ${{ vars.FUNCTION_APP_NAME }}
     steps:
       - name: Get input parameters
         run: |
           echo environment=${{ inputs.environment }}
           echo target=${{ inputs.target }}
-          echo resource_group=${{ env.RESOURCE_GROUP }}
-          echo app_name=${{ env.APP_NAME }}
+          echo resource_group=${{ vars.FUNCTION_RESOURCE_GROUP }}
+          echo app_name=${{ vars.FUNCTION_APP_NAME }}
           echo registry_image=${{ inputs.registry_image }}
           
 
