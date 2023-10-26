@@ -40,6 +40,10 @@ on:
         type: string
         default: skip
 
+env:
+  RESOURCE_GROUP: ${{ vars.FUNCTION_RESOURCE_GROUP }}
+  APP_NAME: ${{ vars.FUNCTION_APP_NAME }}
+
 permissions:
   packages: write
   contents: write
@@ -47,9 +51,6 @@ permissions:
   id-token: write
   actions: read
 
-env:
-  RESOURCE_GROUP: ${{ vars.FUNCTION_RESOURCE_GROUP }}
-  APP_NAME: ${{ vars.FUNCTION_APP_NAME }}
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
