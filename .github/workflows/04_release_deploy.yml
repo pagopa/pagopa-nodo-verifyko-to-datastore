@@ -47,6 +47,9 @@ permissions:
   id-token: write
   actions: read
 
+env:
+  RESOURCE_GROUP: ${{ vars.FUNCTION_RESOURCE_GROUP }}
+  APP_NAME: ${{ vars.FUNCTION_APP_NAME }}
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -113,8 +116,8 @@ jobs:
     with:
       environment: ${{ matrix.environment }}
       target: ${{ needs.setup.outputs.environment }}
-      resource_group: ${{ env.RESOURCE_GROUP }}
-      app_name: ${{ env.APP_NAME }}
+      resource_group: ${{ vars.FUNCTION_RESOURCE_GROUP }}
+      app_name: ${{ vars.FUNCTION_APP_NAME }}
       registry_image: ${{ needs.release.outputs.registry_image }}
 
   notify:
