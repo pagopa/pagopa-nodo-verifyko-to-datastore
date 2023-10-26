@@ -40,8 +40,7 @@ jobs:
     name: Create staging slots
     runs-on: ubuntu-22.04
     if: ${{ inputs.target == inputs.environment && inputs.target == 'prod' }}
-    environment:
-      name: ${{ inputs.environment }}
+    environment: ${{ inputs.environment }}
     steps:
       - name: Create staging slots
         uses: pagopa/github-actions-template/azure-function-start-staging-slot@a1b72480e9ac555364be0b7ecdcc8f5ab1c89ad9
@@ -50,8 +49,8 @@ jobs:
           client_id: ${{ secrets.CLIENT_ID }}
           tenant_id: ${{ secrets.TENANT_ID }}
           subscription_id: ${{ secrets.SUBSCRIPTION_ID }}
-          resource_group: ${{ env.RESOURCE_GROUP }}
-          app_name: ${{ env.APP_NAME }}
+          resource_group: ${{ vars.FUNCTION_RESOURCE_GROUP }}
+          app_name: ${{ vars.FUNCTION_APP_NAME }}
           registry_image: ${{ inputs.registry_image }}
 
 
@@ -61,8 +60,7 @@ jobs:
     runs-on: ubuntu-22.04
     needs: [ start_staging_slot ]
     if: ${{ always() && inputs.target == inputs.environment }}
-    environment:
-      name: ${{ inputs.environment }}
+    environment: ${{ inputs.environment }}
     steps:
       - name: Deploy Azure Function
         uses: pagopa/github-actions-template/azure-functions-deploy@a1b72480e9ac555364be0b7ecdcc8f5ab1c89ad9
@@ -71,7 +69,7 @@ jobs:
           client_id: ${{ secrets.CLIENT_ID }}
           tenant_id: ${{ secrets.TENANT_ID }}
           subscription_id: ${{ secrets.SUBSCRIPTION_ID }}
-          app_name: ${{ env.APP_NAME }}
+          app_name: ${{ vars.FUNCTION_APP_NAME }}
           registry_image: ${{ inputs.registry_image }}
 
 
@@ -81,8 +79,7 @@ jobs:
     needs: [ start_staging_slot, deploy ]
     if: ${{ success() || failure() && (inputs.target == inputs.environment && inputs.target == 'prod') }}
     runs-on: ubuntu-22.04
-    environment:
-      name: ${{ inputs.environment }}
+    environment: ${{ inputs.environment }}
     steps:
       - name: Deploy Azure Function
         uses: pagopa/github-actions-template/azure-function-stop-staging-slot@a1b72480e9ac555364be0b7ecdcc8f5ab1c89ad9
@@ -91,6 +88,6 @@ jobs:
           client_id: ${{ secrets.CLIENT_ID }}
           tenant_id: ${{ secrets.TENANT_ID }}
           subscription_id: ${{ secrets.SUBSCRIPTION_ID }}
-          resource_group: ${{ env.RESOURCE_GROUP }}
-          app_name: ${{ env.APP_NAME }}
+          resource_group: ${{ vars.FUNCTION_RESOURCE_GROUP }}
+          app_name: ${{ vars.FUNCTION_APP_NAME }}
           registry_image: ${{ inputs.registry_image }}
