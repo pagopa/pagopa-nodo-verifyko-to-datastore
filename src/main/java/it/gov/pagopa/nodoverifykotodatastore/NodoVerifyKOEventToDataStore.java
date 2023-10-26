@@ -8,9 +8,7 @@ import it.gov.pagopa.nodoverifykotodatastore.util.ObjectMapperUtils;
 import lombok.NonNull;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -39,8 +37,9 @@ public class NodoVerifyKOEventToDataStore {
 			@NonNull OutputBinding<List<Object>> documentdb,
             final ExecutionContext context) {
 
+
 		Logger logger = context.getLogger();
-		logger.log(Level.INFO, "Persisting {0} events...", events.size());
+		logger.log(Level.INFO, () -> String.format("Persisting [%d] events...", events.size()));
 
         try {
         	if (events.size() == properties.length) {
@@ -51,11 +50,10 @@ public class NodoVerifyKOEventToDataStore {
 
 					// update event with the required parameters and other needed fields
 					properties[index].forEach((property, value) -> event.put(replaceDashWithUppercase(property), value));
-					event.put(Constants.ID_EVENT_FIELD, event.get(Constants.UNIQUE_ID_EVENT_FIELD));
-					String insertedDateValue = event.get(Constants.INSERTED_TIMESTAMP_EVENT_FIELD) != null ? ((String)event.get(Constants.INSERTED_TIMESTAMP_EVENT_FIELD)).substring(0, 10) : Constants.NA;
-					event.put(Constants.INSERTED_DATE_EVENT_FIELD, insertedDateValue);
+
+					String insertedTimestampValue = getEventField(event, Constants.INSERTED_TIMESTAMP_EVENT_FIELD, String.class, Constants.NA);
+					String insertedDateValue = Constants.NA.equals(insertedTimestampValue) ? Constants.NA : insertedTimestampValue.substring(0, 10);
 					event.put(Constants.PARTITION_KEY_EVENT_FIELD, generatePartitionKey(event, insertedDateValue));
-					event.put(Constants.PAYLOAD_EVENT_FIELD, null);
 
 					eventsToPersist.add(event);
 				}
@@ -63,12 +61,12 @@ public class NodoVerifyKOEventToDataStore {
 				// save all events in the retrieved batch in the storage
 				persistEventBatch(logger, documentdb, eventsToPersist);
             } else {
-				logger.log(Level.SEVERE, "Error processing events, lengths do not match [{0}, {1}]", new Object[]{events.size(), properties.length});
+				logger.log(Level.SEVERE, () -> String.format("[ALERT][VerifyKOToDS] AppException - Error processing events, lengths do not match: [events: %d - properties: %d]", events.size(), properties.length));
             }
         } catch (NullPointerException e) {
-            logger.severe("NullPointerException exception on cosmos nodo-verify-ko-events msg ingestion at "+ LocalDateTime.now()+ " : " + e.getMessage());
-        } catch (Throwable e) {
-            logger.severe("Generic exception on cosmos nodo-verify-ko-events msg ingestion at "+ LocalDateTime.now()+ " : " + e.getMessage());
+            logger.log(Level.SEVERE, () -> "[ALERT][VerifyKOToDS] AppException - NullPointerException exception on cosmos nodo-verify-ko-events msg ingestion at " + LocalDateTime.now() + " : " + e.getMessage());
+        } catch (Exception e) {
+			logger.log(Level.SEVERE, () -> "[ALERT][VerifyKOToDS] AppException - Generic exception on cosmos nodo-verify-ko-events msg ingestion at " + LocalDateTime.now() + " : " + e.getMessage());
         }
     }
 
@@ -86,20 +84,31 @@ public class NodoVerifyKOEventToDataStore {
 	}
 
 	private void persistEventBatch(Logger logger, OutputBinding<List<Object>> documentdb, List<Object> eventsToPersistCosmos) {
-		try {
-			documentdb.setValue(eventsToPersistCosmos);
-			logger.info("Done processing events");
-		} catch (Throwable t){
-			logger.log(Level.SEVERE, "Could not save {0} events on CosmosDB, error: [{1}]", new Object[]{eventsToPersistCosmos.size(), t});
-		}
+		documentdb.setValue(eventsToPersistCosmos);
+		logger.info("Done processing events");
 	}
 
 	private String generatePartitionKey(Map<String, Object> event, String insertedDateValue) {
-		return new StringBuilder().append(insertedDateValue)
-				.append("-")
-				.append(event.get(Constants.ID_DOMINIO_EVENT_FIELD) != null ? event.get(Constants.ID_DOMINIO_EVENT_FIELD).toString() : Constants.NA)
-				.append("-")
-				.append(event.get(Constants.PSP_EVENT_FIELD) != null ? event.get(Constants.PSP_EVENT_FIELD).toString() : Constants.NA)
-				.toString();
+		return insertedDateValue.replace(":", "").replace(".", "").replace("T", "").replace("-", "") +
+				"-" +
+				getEventField(event, Constants.CREDITOR_ID_EVENT_FIELD, String.class, Constants.NA) +
+				"-" +
+				getEventField(event, Constants.PSP_ID_EVENT_FIELD, String.class, Constants.NA);
+	}
+
+	private <T> T getEventField(Map<String, Object> event, String name, Class<T> clazz, T defaultValue) {
+		T field = null;
+		List<String> splitPath = List.of(name.split("\\."));
+		Map eventSubset = event;
+		Iterator<String> it = splitPath.listIterator();
+		while(it.hasNext()) {
+			Object retrievedEventField = eventSubset.get(it.next());
+			if (!it.hasNext()) {
+				field = clazz.cast(retrievedEventField);
+			} else {
+				eventSubset = (Map) retrievedEventField;
+			}
+		}
+		return field == null ? defaultValue : field;
 	}
 }
