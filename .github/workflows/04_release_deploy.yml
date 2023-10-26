@@ -40,10 +40,6 @@ on:
         type: string
         default: skip
 
-env:
-  RESOURCE_GROUP: ${{ vars.FUNCTION_RESOURCE_GROUP }}
-  APP_NAME: ${{ vars.FUNCTION_APP_NAME }}
-
 permissions:
   packages: write
   contents: write
