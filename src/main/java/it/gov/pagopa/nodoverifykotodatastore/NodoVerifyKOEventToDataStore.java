@@ -7,6 +7,7 @@ import it.gov.pagopa.nodoverifykotodatastore.util.Constants;
 import it.gov.pagopa.nodoverifykotodatastore.util.ObjectMapperUtils;
 import lombok.NonNull;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.logging.Level;
@@ -51,8 +52,8 @@ public class NodoVerifyKOEventToDataStore {
 					// update event with the required parameters and other needed fields
 					properties[index].forEach((property, value) -> event.put(replaceDashWithUppercase(property), value));
 
-					String insertedTimestampValue = getEventField(event, Constants.INSERTED_TIMESTAMP_EVENT_FIELD, String.class, Constants.NA);
-					String insertedDateValue = Constants.NA.equals(insertedTimestampValue) ? Constants.NA : insertedTimestampValue.substring(0, 10);
+					Long insertedTimestampValue = getEventField(event, Constants.FAULTBEAN_TIMESTAMP_EVENT_FIELD, Long.class, 0L);
+					String insertedDateValue = insertedTimestampValue == 0L ? Constants.NA : new SimpleDateFormat("yyyy-MM-dd").format(new Date(insertedTimestampValue));
 					event.put(Constants.PARTITION_KEY_EVENT_FIELD, generatePartitionKey(event, insertedDateValue));
 
 					eventsToPersist.add(event);
