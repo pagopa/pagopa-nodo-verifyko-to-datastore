@@ -5,7 +5,7 @@
 
     <groupId>it.gov.pagopa</groupId>
     <artifactId>nodoverifykotodatastore</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.1-7-NOD-541-creazione-azure-function-per-riversamento-eventi-verifica-ko</version>
     <packaging>jar</packaging>
 
     <name>Nodo Verify KO to datastore Fn</name>

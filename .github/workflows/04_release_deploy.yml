@@ -69,6 +69,7 @@ jobs:
     name: Create a New Release
     runs-on: ubuntu-latest
     needs: [setup]
+    environment: ${{ inputs.environment }}
     outputs:
       version: ${{ steps.release.outputs.version }}
       registry_image: ${{ steps.get_image.outputs.registry_image }}
@@ -112,15 +113,13 @@ jobs:
     with:
       environment: ${{ matrix.environment }}
       target: ${{ needs.setup.outputs.environment }}
-      resource_group: ${{ vars.FUNCTION_RESOURCE_GROUP }}
-      app_name: ${{ vars.FUNCTION_APP_NAME }}
       registry_image: ${{ needs.release.outputs.registry_image }}
 
   notify:
     name: Notify
     needs: [ setup, release, deploy_azure_fn ]
     runs-on: ubuntu-latest
-    if: always()
+    if: ${{ always() && needs.setup.outputs.environment != 'dev' }}
     steps:
       - name: Report Status
         if: always()

@@ -2,25 +2,38 @@
   "version": "2.0",
   "extensionBundle": {
     "id": "Microsoft.Azure.Functions.ExtensionBundle",
-    "version": "[2.*, 3.0.0)"
+    "version": "[4.0.0, 5.0.0)"
   },
   "extensions": {
+    "eventHubs": {
+      "maxEventBatchSize" : 10,
+      "batchCheckpointFrequency" : 2,
+      "prefetchCount" : 100,
+      "initialOffsetOptions" : {
+        "type" : "fromStart"
+      },
+      "clientRetryOptions": {
+        "maximumRetries": 5
+      }
+    },
     "http": {
       "routePrefix": ""
     }
   },
+  "functions": [ "Info", "EventHubNodoVerifyKOEventToDSProcessor" ],
   "logging": {
+    "applicationInsights": {
+      "samplingSettings": {
+        "isEnabled": false
+      }
+    },
     "fileLoggingMode": "always",
     "logLevel": {
       "default": "Information",
       "Host.Results": "Error",
       "Function": "Information",
+      "Function.EventHubNodoVerifyKOEventToDSProcessor": "Error",
       "Host.Aggregator": "Trace"
-    },
-    "applicationInsights": {
-      "samplingSettings": {
-        "isEnabled": false
     }
-  } 
-}
+  }
 }
