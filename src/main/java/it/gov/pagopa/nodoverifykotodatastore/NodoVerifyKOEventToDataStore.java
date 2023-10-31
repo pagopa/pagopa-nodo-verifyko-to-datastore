@@ -64,9 +64,9 @@ public class NodoVerifyKOEventToDataStore {
             } else {
 				logger.log(Level.SEVERE, () -> String.format("[ALERT][VerifyKOToDS] AppException - Error processing events, lengths do not match: [events: %d - properties: %d]", events.size(), properties.length));
             }
-        } catch (NullPointerException e) {
-            logger.log(Level.SEVERE, () -> "[ALERT][VerifyKOToDS] AppException - NullPointerException exception on cosmos nodo-verify-ko-events msg ingestion at " + LocalDateTime.now() + " : " + e);
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
+			logger.log(Level.SEVERE, () -> "[ALERT][VerifyKOToDS] AppException - Illegal argument exception on cosmos nodo-verify-ko-events msg ingestion at " + LocalDateTime.now() + " : " + e);
+		} catch (Exception e) {
 			logger.log(Level.SEVERE, () -> "[ALERT][VerifyKOToDS] AppException - Generic exception on cosmos nodo-verify-ko-events msg ingestion at " + LocalDateTime.now() + " : " + e.getMessage());
         }
     }
@@ -108,6 +108,9 @@ public class NodoVerifyKOEventToDataStore {
 				field = clazz.cast(retrievedEventField);
 			} else {
 				eventSubset = (Map) retrievedEventField;
+				if (eventSubset == null) {
+					throw new IllegalArgumentException("The field [" + name + "] does not exists in the passed event.");
+				}
 			}
 		}
 		return field == null ? defaultValue : field;
