@@ -5,7 +5,7 @@
 
     <groupId>it.gov.pagopa</groupId>
     <artifactId>nodoverifykotodatastore</artifactId>
-    <version>0.0.1-8-NOD-568-ottimizzazione-logging</version>
+    <version>0.1.0</version>
     <packaging>jar</packaging>
 
     <name>Nodo Verify KO to datastore Fn</name>
