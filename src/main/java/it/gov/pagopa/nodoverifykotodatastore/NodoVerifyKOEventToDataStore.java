@@ -52,7 +52,7 @@ public class NodoVerifyKOEventToDataStore {
 					// update event with the required parameters and other needed fields
 					properties[index].forEach((property, value) -> event.put(replaceDashWithUppercase(property), value));
 
-					Long insertedTimestampValue = getEventField(event, Constants.FAULTBEAN_TIMESTAMP_EVENT_FIELD, Long.class, 0L);
+					long insertedTimestampValue = getEventField(event, Constants.FAULTBEAN_TIMESTAMP_EVENT_FIELD, Number.class, 0L).longValue();
 					String insertedDateValue = insertedTimestampValue == 0L ? Constants.NA : new SimpleDateFormat("yyyy-MM-dd").format(new Date(insertedTimestampValue));
 					event.put(Constants.PARTITION_KEY_EVENT_FIELD, generatePartitionKey(event, insertedDateValue));
 
@@ -65,7 +65,7 @@ public class NodoVerifyKOEventToDataStore {
 				logger.log(Level.SEVERE, () -> String.format("[ALERT][VerifyKOToDS] AppException - Error processing events, lengths do not match: [events: %d - properties: %d]", events.size(), properties.length));
             }
         } catch (NullPointerException e) {
-            logger.log(Level.SEVERE, () -> "[ALERT][VerifyKOToDS] AppException - NullPointerException exception on cosmos nodo-verify-ko-events msg ingestion at " + LocalDateTime.now() + " : " + e.getMessage());
+            logger.log(Level.SEVERE, () -> "[ALERT][VerifyKOToDS] AppException - NullPointerException exception on cosmos nodo-verify-ko-events msg ingestion at " + LocalDateTime.now() + " : " + e);
         } catch (Exception e) {
 			logger.log(Level.SEVERE, () -> "[ALERT][VerifyKOToDS] AppException - Generic exception on cosmos nodo-verify-ko-events msg ingestion at " + LocalDateTime.now() + " : " + e.getMessage());
         }
