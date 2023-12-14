@@ -20,6 +20,6 @@
   "faultBean": {
     "faultCode": "PPT_STAZIONE_INT_PA_ERRORE_RESPONSE",
     "description": "EC service error at 2023-01-01T12:00:00",
-    "timestamp": 1672570800000
+    "timestamp": "2023-12-12T18:34:39.860654"
   }
 }
