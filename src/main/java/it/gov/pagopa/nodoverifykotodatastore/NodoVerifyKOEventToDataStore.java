@@ -7,8 +7,6 @@ import it.gov.pagopa.nodoverifykotodatastore.util.Constants;
 import it.gov.pagopa.nodoverifykotodatastore.util.ObjectMapperUtils;
 import lombok.NonNull;
 
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -82,8 +80,7 @@ public class NodoVerifyKOEventToDataStore {
 			logger.log(Level.SEVERE, () -> "[ALERT][VerifyKOToDS] AppException - Illegal argument exception on cosmos nodo-verify-ko-events msg ingestion at " + LocalDateTime.now() + " : " + e);
 		} catch (IllegalStateException e) {
 			logger.log(Level.SEVERE, () -> "[ALERT][VerifyKOToDS] AppException - Missing argument exception on nodo-verify-ko-events msg ingestion at " + LocalDateTime.now() + " : " + e);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			logger.log(Level.SEVERE, () -> "[ALERT][VerifyKOToDS] AppException - Generic exception on cosmos nodo-verify-ko-events msg ingestion at " + LocalDateTime.now() + " : " + e.getMessage());
         }
     }

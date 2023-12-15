@@ -6,15 +6,12 @@ import static org.mockito.Mockito.*;
 
 import java.sql.Array;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.azure.functions.ExecutionContext;
@@ -26,7 +23,6 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -71,15 +67,6 @@ class NodoVerifyKOEventToDataStoreTest {
         verify(document).setValue(captor.capture());
         List<Object> actualEventsToPersist = captor.getValue();
         assertEquals(convertWithStream(expectedEventsToPersist), convertWithStream(actualEventsToPersist));
-    }
-
-    public String convertWithStream(List<Object> listOfMaps) {
-        return listOfMaps.stream()
-                .map(obj -> new TreeMap<>((Map<String, Object>) obj))
-                .map(entry -> entry.entrySet().stream()
-                        .map(item -> item.getKey() + "=" + item.getValue())
-                        .collect(Collectors.joining(", ")))
-                .collect(Collectors.joining(", "));
     }
 
     @SuppressWarnings("unchecked")
@@ -217,4 +204,12 @@ class NodoVerifyKOEventToDataStoreTest {
         assertTrue(logHandler.getLogs().contains("[ALERT][VerifyKOToDS] AppException - Generic exception on cosmos nodo-verify-ko-events msg ingestion"));
     }
 
+    public String convertWithStream(List<Object> listOfMaps) {
+        return listOfMaps.stream()
+                .map(obj -> new TreeMap<>((Map<String, Object>) obj))
+                .map(entry -> entry.entrySet().stream()
+                        .map(item -> item.getKey() + "=" + item.getValue())
+                        .collect(Collectors.joining(", ")))
+                .collect(Collectors.joining(", "));
+    }
 }
