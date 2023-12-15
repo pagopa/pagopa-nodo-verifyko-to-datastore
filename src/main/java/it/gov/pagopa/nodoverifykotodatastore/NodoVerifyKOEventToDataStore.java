@@ -52,7 +52,7 @@ public class NodoVerifyKOEventToDataStore {
 					// update event with the required parameters and other needed fields
 					properties[index].forEach((property, value) -> event.put(replaceDashWithUppercase(property), value));
 
-					Map faultBeanMap = (Map) event.getOrDefault(Constants.FAULTBEAN_EVENT_FIELD, new HashMap<>());
+					Map<String, Object> faultBeanMap = (Map) event.getOrDefault(Constants.FAULTBEAN_EVENT_FIELD, new HashMap<>());
 					String faultBeanTimestamp = (String) faultBeanMap.getOrDefault(Constants.TIMESTAMP_EVENT_FIELD, "ERROR");
 					if (faultBeanTimestamp.equals("ERROR")) {
 						throw new IllegalStateException("Missing " + Constants.FAULTBEAN_EVENT_FIELD + " or " + Constants.FAULTBEAN_TIMESTAMP_EVENT_FIELD);
