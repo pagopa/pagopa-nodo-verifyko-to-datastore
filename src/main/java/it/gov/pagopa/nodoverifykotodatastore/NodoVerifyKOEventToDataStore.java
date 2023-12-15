@@ -54,6 +54,10 @@ public class NodoVerifyKOEventToDataStore {
 
 					Map<String, Object> faultBeanMap = (Map) event.getOrDefault(Constants.FAULTBEAN_EVENT_FIELD, new HashMap<>());
 					String faultBeanTimestamp = (String) faultBeanMap.getOrDefault(Constants.TIMESTAMP_EVENT_FIELD, "ERROR");
+
+					// sometimes faultBeanTimestamp has less than 6 digits regarding microseconds
+					faultBeanTimestamp = fixDateTime(faultBeanTimestamp);
+
 					if (faultBeanTimestamp.equals("ERROR")) {
 						throw new IllegalStateException("Missing " + Constants.FAULTBEAN_EVENT_FIELD + " or " + Constants.FAULTBEAN_TIMESTAMP_EVENT_FIELD);
 					}
@@ -84,6 +88,16 @@ public class NodoVerifyKOEventToDataStore {
 			logger.log(Level.SEVERE, () -> "[ALERT][VerifyKOToDS] AppException - Generic exception on cosmos nodo-verify-ko-events msg ingestion at " + LocalDateTime.now() + " : " + e.getMessage());
         }
     }
+
+	private String fixDateTime(String faultBeanTimestamp) {
+		int dotIndex = faultBeanTimestamp.indexOf('.');
+		if (dotIndex != -1) {
+			int fractionLength = faultBeanTimestamp.length() - dotIndex - 1;
+			faultBeanTimestamp = fractionLength < 6 ? String.format("%s%s", faultBeanTimestamp, "0".repeat(6 - fractionLength)) : faultBeanTimestamp;
+
+		}
+		return faultBeanTimestamp;
+	}
 
 	private String replaceDashWithUppercase(String input) {
 		if(!input.contains("-")){
