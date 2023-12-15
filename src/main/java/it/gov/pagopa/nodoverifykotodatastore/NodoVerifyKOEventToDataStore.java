@@ -7,8 +7,9 @@ import it.gov.pagopa.nodoverifykotodatastore.util.Constants;
 import it.gov.pagopa.nodoverifykotodatastore.util.ObjectMapperUtils;
 import lombok.NonNull;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,7 +39,6 @@ public class NodoVerifyKOEventToDataStore {
 			@NonNull OutputBinding<List<Object>> documentdb,
             final ExecutionContext context) {
 
-
 		Logger logger = context.getLogger();
 		logger.log(Level.INFO, () -> String.format("Persisting [%d] events...", events.size()));
 
@@ -52,8 +52,20 @@ public class NodoVerifyKOEventToDataStore {
 					// update event with the required parameters and other needed fields
 					properties[index].forEach((property, value) -> event.put(replaceDashWithUppercase(property), value));
 
-					long insertedTimestampValue = getEventField(event, Constants.FAULTBEAN_TIMESTAMP_EVENT_FIELD, Number.class, 0L).longValue();
-					String insertedDateValue = insertedTimestampValue == 0L ? Constants.NA : new SimpleDateFormat("yyyy-MM-dd").format(new Date(insertedTimestampValue));
+					Map<String, Object> faultBeanMap = (Map) event.getOrDefault(Constants.FAULTBEAN_EVENT_FIELD, new HashMap<>());
+					String faultBeanTimestamp = (String) faultBeanMap.getOrDefault(Constants.TIMESTAMP_EVENT_FIELD, "ERROR");
+					if (faultBeanTimestamp.equals("ERROR")) {
+						throw new IllegalStateException("Missing " + Constants.FAULTBEAN_EVENT_FIELD + " or " + Constants.FAULTBEAN_TIMESTAMP_EVENT_FIELD);
+					}
+
+					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS");
+					LocalDateTime dateTime = LocalDateTime.parse(faultBeanTimestamp, formatter);
+
+					long timestamp = dateTime.toEpochSecond(ZoneOffset.UTC);
+					faultBeanMap.put(Constants.TIMESTAMP_EVENT_FIELD, timestamp);
+					faultBeanMap.put(Constants.DATE_TIME_EVENT_FIELD, faultBeanTimestamp);
+
+					String insertedDateValue = dateTime.getYear() + "-" + dateTime.getMonthValue() + "-" + dateTime.getDayOfMonth();
 					event.put(Constants.PARTITION_KEY_EVENT_FIELD, generatePartitionKey(event, insertedDateValue));
 
 					eventsToPersist.add(event);
@@ -66,6 +78,8 @@ public class NodoVerifyKOEventToDataStore {
             }
         } catch (IllegalArgumentException e) {
 			logger.log(Level.SEVERE, () -> "[ALERT][VerifyKOToDS] AppException - Illegal argument exception on cosmos nodo-verify-ko-events msg ingestion at " + LocalDateTime.now() + " : " + e);
+		} catch (IllegalStateException e) {
+			logger.log(Level.SEVERE, () -> "[ALERT][VerifyKOToDS] AppException - Missing argument exception on nodo-verify-ko-events msg ingestion at " + LocalDateTime.now() + " : " + e);
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, () -> "[ALERT][VerifyKOToDS] AppException - Generic exception on cosmos nodo-verify-ko-events msg ingestion at " + LocalDateTime.now() + " : " + e.getMessage());
         }
