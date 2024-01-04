@@ -94,7 +94,9 @@ public class NodoVerifyKOEventToDataStore {
 		if (dotIndex != -1) {
 			int fractionLength = faultBeanTimestamp.length() - dotIndex - 1;
 			faultBeanTimestamp = fractionLength < 6 ? String.format("%s%s", faultBeanTimestamp, "0".repeat(6 - fractionLength)) : faultBeanTimestamp;
-
+		}
+		else {
+			faultBeanTimestamp = String.format("%s.000000", faultBeanTimestamp);
 		}
 		return faultBeanTimestamp;
 	}
