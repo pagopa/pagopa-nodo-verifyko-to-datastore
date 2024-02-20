@@ -110,8 +110,8 @@ public class NodoVerifyKOEventToDataStore {
         return Arrays.toString(eventsToPersist.stream()
                 .map(event -> {
                     Map<String, Object> eventMap = (Map<String, Object>) event;
-					String rowKey = getEventField(eventMap, "id", String.class, "UNKNOWN-ROW-KEY");
-					String partitionKey = getEventField(eventMap, Constants.PARTITION_KEY_EVENT_FIELD, String.class, "UNKNOWN-PARTITION-KEY");
+					String rowKey = getEventField(eventMap, "id", String.class, "null");
+					String partitionKey = getEventField(eventMap, Constants.PARTITION_KEY_EVENT_FIELD, String.class, "null");
 					Long eventTimestamp = getEventField(eventMap, "faultBean.timestamp", Long.class, -1L);
                     return String.format("{PartitionKey: %s, RowKey: %s, EventTimestamp: %d}", partitionKey, rowKey, eventTimestamp);
                 })
