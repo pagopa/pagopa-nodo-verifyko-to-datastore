@@ -79,7 +79,7 @@ public class NodoVerifyKOEventToDataStore {
 					eventsToPersist.add(event);
 				}
 
-				logger.log(Level.INFO, () -> String.format("Performing event ingestion: InvocationId [%s], Events: [%s]", context.getInvocationId(), extractTraceForEventsToPersist(eventsToPersist)));
+				logger.log(Level.INFO, () -> String.format("Performing event ingestion: InvocationId [%s], Events: %s", context.getInvocationId(), extractTraceForEventsToPersist(eventsToPersist)));
 
 				// save all events in the retrieved batch in the storage
 				persistEventBatch(logger, documentdb, eventsToPersist);
