@@ -33,7 +33,7 @@
     "applicationInsights": {
       "samplingSettings": {
         "isEnabled": true,
-        "maxTelemetryItemsPerSecond": 5,
+        "maxTelemetryItemsPerSecond": 20,
         "includedTypes": "PageView;Trace;Dependency;Request",
         "excludedTypes": "Exception;Event;CustomEvent"
       }
