@@ -23,7 +23,6 @@ import java.util.regex.Matcher;
 public class NodoVerifyKOEventToDataStore {
 
 	@FunctionName("EventHubNodoVerifyKOEventToDSProcessor")
-	@ExponentialBackoffRetry(maxRetryCount = 0, minimumInterval = "", maximumInterval = "")
     public void processNodoVerifyKOEvent (
             @EventHubTrigger(
                     name = "NodoVerifyKOEvent",
