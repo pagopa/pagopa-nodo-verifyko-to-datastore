@@ -6,8 +6,8 @@
   },
   "extensions": {
     "tracing": {
-      "traceInputsAndOutputs": false,
-      "traceReplayEvents": false
+      "traceInputsAndOutputs": true,
+      "traceReplayEvents": true
     },
     "eventHubs": {
       "maxEventBatchSize" : 10,
