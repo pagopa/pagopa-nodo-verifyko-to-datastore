@@ -23,6 +23,7 @@ import java.util.regex.Matcher;
 public class NodoVerifyKOEventToDataStore {
 
 	@FunctionName("EventHubNodoVerifyKOEventToDSProcessor")
+	@ExponentialBackoffRetry(maxRetryCount = 0, minimumInterval = "", maximumInterval = "")
     public void processNodoVerifyKOEvent (
             @EventHubTrigger(
                     name = "NodoVerifyKOEvent",
@@ -38,7 +39,7 @@ public class NodoVerifyKOEventToDataStore {
 					createIfNotExists = false,
 					connection = "COSMOS_CONN_STRING")
 			@NonNull OutputBinding<List<Object>> documentdb,
-            final ExecutionContext context) throws AppException {
+            final ExecutionContext context) {
 
 		String errorCause = null;
 		boolean isPersistenceOk = true;
