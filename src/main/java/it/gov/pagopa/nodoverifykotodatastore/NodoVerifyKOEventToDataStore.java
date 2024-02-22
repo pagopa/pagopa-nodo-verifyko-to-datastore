@@ -23,6 +23,7 @@ import java.util.regex.Matcher;
 public class NodoVerifyKOEventToDataStore {
 
 	@FunctionName("EventHubNodoVerifyKOEventToDSProcessor")
+	@ExponentialBackoffRetry(maxRetryCount = 5, maximumInterval = "00:15:00", minimumInterval = "00:00:10")
     public void processNodoVerifyKOEvent (
             @EventHubTrigger(
                     name = "NodoVerifyKOEvent",
@@ -79,7 +80,7 @@ public class NodoVerifyKOEventToDataStore {
 					eventsToPersist.add(event);
 				}
 
-				logger.log(Level.INFO, () -> String.format("Performing event ingestion: InvocationId [%s], Events: %s", context.getInvocationId(), extractTraceForEventsToPersist(eventsToPersist)));
+				logger.log(Level.INFO, () -> String.format("Performing event ingestion: InvocationId [%s], Retry Attempt [%d], Events: %s", context.getInvocationId(), context.getRetryContext() == null ? -1 : context.getRetryContext().getRetrycount(), extractTraceForEventsToPersist(eventsToPersist)));
 
 				// save all events in the retrieved batch in the storage
 				persistEventBatch(logger, documentdb, eventsToPersist);
