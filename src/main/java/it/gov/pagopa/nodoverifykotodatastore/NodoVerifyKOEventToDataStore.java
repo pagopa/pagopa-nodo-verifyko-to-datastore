@@ -25,7 +25,7 @@ public class NodoVerifyKOEventToDataStore {
 	private static final Integer MAX_RETRY_COUNT = 5;
 
 	@FunctionName("EventHubNodoVerifyKOEventToDSProcessor")
-	@ExponentialBackoffRetry(maxRetryCount = MAX_RETRY_COUNT, maximumInterval = "00:15:00", minimumInterval = "00:00:10")
+	@ExponentialBackoffRetry(maxRetryCount = 5, maximumInterval = "00:15:00", minimumInterval = "00:00:10")
     public void processNodoVerifyKOEvent (
             @EventHubTrigger(
                     name = "NodoVerifyKOEvent",
