@@ -22,8 +22,10 @@ import java.util.regex.Matcher;
  */
 public class NodoVerifyKOEventToDataStore {
 
+	private static final Integer MAX_RETRY_COUNT = 5;
+
 	@FunctionName("EventHubNodoVerifyKOEventToDSProcessor")
-	@ExponentialBackoffRetry(maxRetryCount = 5, maximumInterval = "00:15:00", minimumInterval = "00:00:10")
+	@ExponentialBackoffRetry(maxRetryCount = MAX_RETRY_COUNT, maximumInterval = "00:15:00", minimumInterval = "00:00:10")
     public void processNodoVerifyKOEvent (
             @EventHubTrigger(
                     name = "NodoVerifyKOEvent",
@@ -43,9 +45,14 @@ public class NodoVerifyKOEventToDataStore {
 
 		String errorCause = null;
 		boolean isPersistenceOk = true;
+		int retryIndex = context.getRetryContext() == null ? -1 : context.getRetryContext().getRetrycount();
 
 		Logger logger = context.getLogger();
 		logger.log(Level.FINE, () -> String.format("Persisting [%d] events...", events.size()));
+
+		if (retryIndex == MAX_RETRY_COUNT) {
+			logger.log(Level.WARNING, () -> String.format("[ALERT][LAST RETRY][VerifyKOToDS] Performing last retry for event ingestion: InvocationId [%s], Events: %s", context.getInvocationId(), events));
+		}
 
         try {
         	if (events.size() == properties.length) {
@@ -80,7 +87,7 @@ public class NodoVerifyKOEventToDataStore {
 					eventsToPersist.add(event);
 				}
 
-				logger.log(Level.INFO, () -> String.format("Performing event ingestion: InvocationId [%s], Retry Attempt [%d], Events: %s", context.getInvocationId(), context.getRetryContext() == null ? -1 : context.getRetryContext().getRetrycount(), extractTraceForEventsToPersist(eventsToPersist)));
+				logger.log(Level.INFO, () -> String.format("Performing event ingestion: InvocationId [%s], Retry Attempt [%d], Events: %s", context.getInvocationId(), retryIndex, extractTraceForEventsToPersist(eventsToPersist)));
 
 				// save all events in the retrieved batch in the storage
 				persistEventBatch(logger, documentdb, eventsToPersist);

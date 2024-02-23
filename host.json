@@ -6,8 +6,8 @@
   },
   "extensions": {
     "tracing": {
-      "traceInputsAndOutputs": true,
-      "traceReplayEvents": true
+      "traceInputsAndOutputs": false,
+      "traceReplayEvents": false
     },
     "eventHubs": {
       "maxEventBatchSize" : 10,
@@ -33,7 +33,7 @@
     "applicationInsights": {
       "samplingSettings": {
         "isEnabled": true,
-        "maxTelemetryItemsPerSecond": 20,
+        "maxTelemetryItemsPerSecond": 5,
         "includedTypes": "PageView;Trace;Dependency;Request",
         "excludedTypes": "Exception;Event;CustomEvent"
       }
