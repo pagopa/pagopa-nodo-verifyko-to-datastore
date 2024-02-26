@@ -1,10 +1,8 @@
 package it.gov.pagopa.nodoverifykotodatastore;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +14,7 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.azure.functions.ExecutionContext;
 import com.microsoft.azure.functions.OutputBinding;
+import it.gov.pagopa.nodoverifykotodatastore.exception.AppException;
 import it.gov.pagopa.nodoverifykotodatastore.util.Constants;
 import it.gov.pagopa.nodoverifykotodatastore.util.LogHandler;
 import it.gov.pagopa.nodoverifykotodatastore.util.TestUtil;
@@ -143,7 +142,7 @@ class NodoVerifyKOEventToDataStoreTest {
         properties[1].put("prop1-with-dash", "2");
 
         // execute logic
-        function.processNodoVerifyKOEvent(events, properties, document, context);
+        assertThrows(AppException.class, () -> function.processNodoVerifyKOEvent(events, properties, document, context));
 
         // test assertion
         assertTrue(logHandler.getLogs().contains("Error processing events, lengths do not match: [events: 1 - properties: 2]"));
@@ -170,7 +169,7 @@ class NodoVerifyKOEventToDataStoreTest {
         properties[0].put("prop1-with-dash", "1");
 
         // execute logic
-        function.processNodoVerifyKOEvent(events, properties, document, context);
+        assertThrows(AppException.class, () -> function.processNodoVerifyKOEvent(events, properties, document, context));
 
         // test assertion
         assertTrue(logHandler.getLogs().contains("java.lang.IllegalStateException"));
@@ -179,7 +178,7 @@ class NodoVerifyKOEventToDataStoreTest {
     @SuppressWarnings("unchecked")
     @Test
     @SneakyThrows
-    void runKo_() {
+    void runKo_genericError() {
         // mocking objects
         Logger logger = Logger.getLogger("NodoVerifyKOEventToDataStore-test-logger");
         LogHandler logHandler = new LogHandler();
@@ -198,10 +197,37 @@ class NodoVerifyKOEventToDataStoreTest {
         properties[0].put("prop1-with-dash", "1");
 
         // execute logic
-        function.processNodoVerifyKOEvent(events, properties, document, context);
+        assertThrows(AppException.class, () -> function.processNodoVerifyKOEvent(events, properties, document, context));
 
         // test assertion
         assertTrue(logHandler.getLogs().contains("[ALERT][VerifyKOToDS] AppException - Generic exception on cosmos nodo-verify-ko-events msg ingestion"));
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    @SneakyThrows
+    void runKo_notGenerablePartitionKey() {
+        // mocking objects
+        Logger logger = Logger.getLogger("NodoVerifyKOEventToDataStore-test-logger");
+        LogHandler logHandler = new LogHandler();
+        logger.addHandler(logHandler);
+        when(context.getLogger()).thenReturn(logger);
+        OutputBinding<List<Object>> document = (OutputBinding<List<Object>>) mock(OutputBinding.class);
+
+        // generating input
+        String eventInStringForm = TestUtil.readStringFromFile("events/event_ko_2.json");
+        List<String> events = new ArrayList<>();
+        events.add(eventInStringForm);
+        Map<String, Object>[] properties = new HashMap[1];
+        properties[0] = new HashMap<>();
+        properties[0].put("prop1_without_dash", true);
+        properties[0].put("prop1-with-dash", "1");
+
+        // execute logic
+        assertThrows(AppException.class, () -> function.processNodoVerifyKOEvent(events, properties, document, context));
+
+        // test assertion
+        assertTrue(logHandler.getLogs().contains("[ALERT][VerifyKOToDS] AppException - Illegal argument exception on cosmos nodo-verify-ko-events msg ingestion"));
     }
 
     public String convertWithStream(List<Object> listOfMaps) {

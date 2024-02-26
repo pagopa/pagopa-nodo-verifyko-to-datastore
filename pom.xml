@@ -5,7 +5,7 @@
 
     <groupId>it.gov.pagopa</groupId>
     <artifactId>nodoverifykotodatastore</artifactId>
-    <version>0.1.4</version>
+    <version>0.1.4-7-NOD-706-error-tracing</version>
     <packaging>jar</packaging>
 
     <name>Nodo Verify KO to datastore Fn</name>
