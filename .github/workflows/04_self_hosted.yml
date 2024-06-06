@@ -46,7 +46,7 @@ jobs:
         uses: pagopa/github-actions-template/azure-function-start-staging-slot@a1b72480e9ac555364be0b7ecdcc8f5ab1c89ad9
         with:
           branch: ${{ github.ref_name }}
-          client_id: ${{ secrets.CLIENT_ID }}
+          client_id: ${{ secrets.CD_CLIENT_ID }}
           tenant_id: ${{ secrets.TENANT_ID }}
           subscription_id: ${{ secrets.SUBSCRIPTION_ID }}
           resource_group: ${{ vars.FUNCTION_RESOURCE_GROUP }}
@@ -66,7 +66,7 @@ jobs:
         uses: pagopa/github-actions-template/azure-functions-deploy@a1b72480e9ac555364be0b7ecdcc8f5ab1c89ad9
         with:
           branch: ${{ github.ref_name }}
-          client_id: ${{ secrets.CLIENT_ID }}
+          client_id: ${{ secrets.CD_CLIENT_ID }}
           tenant_id: ${{ secrets.TENANT_ID }}
           subscription_id: ${{ secrets.SUBSCRIPTION_ID }}
           app_name: ${{ vars.FUNCTION_APP_NAME }}
@@ -85,7 +85,7 @@ jobs:
         uses: pagopa/github-actions-template/azure-function-stop-staging-slot@a1b72480e9ac555364be0b7ecdcc8f5ab1c89ad9
         with:
           branch: ${{ github.ref_name }}
-          client_id: ${{ secrets.CLIENT_ID }}
+          client_id: ${{ secrets.CD_CLIENT_ID }}
           tenant_id: ${{ secrets.TENANT_ID }}
           subscription_id: ${{ secrets.SUBSCRIPTION_ID }}
           resource_group: ${{ vars.FUNCTION_RESOURCE_GROUP }}
