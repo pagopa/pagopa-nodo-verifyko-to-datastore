@@ -55,20 +55,35 @@ jobs:
     outputs:
       semver: ${{ steps.semver_setup.outputs.semver }}
       environment: ${{ steps.semver_setup.outputs.environment }}
+      registry_image: ${{ steps.get_image_from_tag.outputs.registry_image }}
     steps:
       - name: Semver setup
         id: semver_setup
-        uses: pagopa/github-actions-template/nodo5-semver-setup@ce252c8501c9242bd6045f7cdd650736b2f38777
+        uses: pagopa/github-actions-template/nodo5-semver-setup@5225a04f93d77fe257acd37f1f1b55109583bbc4
         with:
           semver: ${{ inputs.semver }}
 
       # Set deploy variables
       - run: echo "ENV_SHORT=$(echo ${{steps.semver_setup.outputs.environment}} | cut -c1-1)" >>  $GITHUB_ENV
 
+      - name: Branch or tag selection
+        id: is_git_tag
+        shell: bash
+        run: |
+          echo "IS_GIT_TAG=$(git tag --list | grep ${{ github.ref_name }} | wc -l | bc -l)" >> $GITHUB_ENV
+
+      # set registry image if in uat|prod env and deploy from specific tag
+      - name: Extract image from tag
+        id: get_image_from_tag
+        if: ${{ env.IS_GIT_TAG == '1' && (env.ENVIRONMENT == 'uat' || env.ENVIRONMENT == 'prod') }}
+        shell: bash
+        run: echo "registry_image=ghcr.io/pagopa/pagopa-nodo-verifyko-to-datastore:${{ github.ref_name }}" >> $GITHUB_OUTPUT
+
   release:
     name: Create a New Release
     runs-on: ubuntu-latest
     needs: [setup]
+    if: ${{ needs.setup.outputs.semver != 'skip' }}
     environment: ${{ inputs.environment }}
     outputs:
       version: ${{ steps.release.outputs.version }}
@@ -76,7 +91,7 @@ jobs:
     steps:
       - name: Make Release
         id: release
-        uses: pagopa/github-actions-template/maven-release@main
+        uses: pagopa/github-actions-template/maven-release@v1.5.4
         with:
           semver: ${{ needs.setup.outputs.semver }}
           github_token: ${{ secrets.BOT_TOKEN_GITHUB }}
@@ -84,7 +99,7 @@ jobs:
 
       - name: Set image name from container registry
         id: get_image
-        run: echo "registry_image=${{vars.CONTAINER_REGISTRY_IMAGE}}:${{steps.release.outputs.version}}" >> $GITHUB_OUTPUT
+        run: echo "registry_image=ghcr.io/pagopa/pagopa-nodo-verifyko-to-datastore:${{steps.release.outputs.version}}" >> $GITHUB_OUTPUT
 
   build-and-push:
     name: Build and Push Docker Image
@@ -113,7 +128,7 @@ jobs:
     with:
       environment: ${{ matrix.environment }}
       target: ${{ needs.setup.outputs.environment }}
-      registry_image: ${{ needs.release.outputs.registry_image }}
+      registry_image: ${{ needs.release.outputs.registry_image || needs.setup.outputs.registry_image }}
 
   notify:
     name: Notify

@@ -21,7 +21,7 @@ resource "github_repository_environment" "github_repository_environment" {
 
 locals {
   env_secrets = {
-    "CLIENT_ID" : module.github_runner_app.application_id,
+    "CD_CLIENT_ID" : data.azurerm_user_assigned_identity.identity_cd.client_id,
     "TENANT_ID" : data.azurerm_client_config.current.tenant_id,
     "SUBSCRIPTION_ID" : data.azurerm_subscription.current.subscription_id,
   }
@@ -59,6 +59,7 @@ resource "github_actions_environment_secret" "github_environment_runner_secrets"
 # ENV Variables #
 #################
 
+
 resource "github_actions_environment_variable" "github_environment_runner_variables" {
   for_each      = local.env_variables
   repository    = local.github.repository
@@ -78,6 +79,7 @@ resource "github_actions_secret" "repo_secrets" {
   secret_name     = each.key
   plaintext_value = each.value
 }
+
 
 ############
 ## Labels ##
